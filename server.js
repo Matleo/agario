@@ -64,9 +64,23 @@ io.sockets.on('connection',
             blob = blobs[i];
           }
         }
-        blob.x = data.x;
-        blob.y = data.y;
-        blob.r = data.r;
+        if(blob != null){//might be null, due to asynchronous clientEaten callback
+          blob.x = data.x;
+          blob.y = data.y;
+          blob.r = data.r;
+        }
+      }
+    );
+
+    socket.on('clientEaten',
+      function(id) {
+        console.log("Server:"+id+" has gotten eaten. Game Over!");
+        for(i=0; i<blobs.length;i++){
+          if(blobs[i].id == id){
+            blobs.splice(i,1);
+          }
+        }
+        io.sockets.emit('gameOver', id);
       }
     );
 
