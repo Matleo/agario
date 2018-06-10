@@ -9,7 +9,6 @@ function Blob(id, x, y, r) {
 
 // Using express: http://expressjs.com/
 var express = require('express');
-const fs = require('fs');
 
 // Create the app
 var app = express();
@@ -21,17 +20,13 @@ if(port == undefined){
   port = 4000;
 }
 
-fs.writeFile('public/port.txt', port , (err) => {
-  if (err) throw err;
-  console.log('The file has been saved! '+process.env.PORT);
-});
 var server = app.listen(port,'0.0.0.0', listen);
 
 // This call back just tells us that the server has started
 function listen() {
   var host = server.address().address;
   var port = server.address().port;
-  console.log('Example app listening at http://' + host + ':' + port);
+  console.log('Server listening at http://' + host + ':' + port);
 }
 
 app.use(express.static('public'));

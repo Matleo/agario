@@ -64,17 +64,30 @@ function showFoodAndBlobs(){
   }
 }
 
-function readPort(){
-  var txt = "";
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function(){
-    if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
-      txt = xmlhttp.responseText;
-      port = txt; //set port in sketch
-      console.log(port);
-      setupSocket();
+
+function setupSocket(){
+    // Start a socket connection to the server
+    socket = io();
+
+    socket.on('heartbeat',
+      function(data) {
+        blobs = [];
+        for(i = 0; i<data.length;i++){
+          blobs.push(new Blob(false, data[i].id, data[i].x,data[i].y,data[i].r));// not me
+        }
+        //if was initial, now is not anymore
+        if(initiated != null && !initiated){
+          initiated = true;
+        }
+      }
+    );
+
+    socket.on('gameOver',
+      function(id) {
+        if(id == blob.id){
+          var canvas = document.getElementById('canvas_container');
+          canvas.style.visibility = 'hidden';
+      }
     }
-  };
-  xmlhttp.open("GET","port.txt",true);
-  xmlhttp.send();
+    );
 }

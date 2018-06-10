@@ -1,5 +1,4 @@
 var socket;
-var port;
 
 var blob;
 var blobs = [];
@@ -22,7 +21,7 @@ function preload(){
 }
 
 function setup() {
-  port = readPort();
+  setupSocket();
   var canvas = createCanvas(900, 600);
   canvas.parent('canvas_container'); //put canvas in its html div container
 
@@ -35,32 +34,6 @@ function setup() {
   background_music.loop(0,1,0.1);//start music
 }
 
-function setupSocket(){
-    // Start a socket connection to the server
-    socket = io();
-
-    socket.on('heartbeat',
-      function(data) {
-        blobs = [];
-        for(i = 0; i<data.length;i++){
-          blobs.push(new Blob(false, data[i].id, data[i].x,data[i].y,data[i].r));// not me
-        }
-        //if was initial, now is not anymore
-        if(initiated != null && !initiated){
-          initiated = true;
-        }
-      }
-    );
-
-    socket.on('gameOver',
-      function(id) {
-        if(id == blob.id){
-          var canvas = document.getElementById('canvas_container');
-          canvas.style.visibility = 'hidden';
-      }
-    }
-    );
-}
 
 function draw() {
   if(socket == undefined){
