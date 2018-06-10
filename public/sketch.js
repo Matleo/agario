@@ -28,7 +28,7 @@ function setup() {
 
   // Start a socket connection to the server
   // Some day we would run this server somewhere else
-  socket = io.connect('http://localhost:4000');
+  socket = io.connect('http://localhost:5000');
 
   //set food:
   setFood();
