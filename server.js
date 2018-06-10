@@ -19,7 +19,7 @@ var app = express();
 
 fs.writeFile('public/port.txt', process.env.PORT, (err) => {
   if (err) throw err;
-  console.log('The file has been saved!');
+  console.log('The file has been saved! '+process.env.PORT);
 });
 var server = app.listen(process.env.PORT || 4000,'0.0.0.0', listen);
 
