@@ -37,7 +37,7 @@ function setup() {
 
 function setupSocket(){
     // Start a socket connection to the server
-    socket = io();
+    socket = io.connect('https://stormy-cove-42139.herokuapp.com:'+port);
 
     socket.on('heartbeat',
       function(data) {
