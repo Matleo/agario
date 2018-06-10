@@ -50,6 +50,12 @@ class Blob {
       textAlign(CENTER);
       textSize(4);
       text(this.id, this.pos.x, this.pos.y + this.r);
+    }else if(this.me){
+      fill(0);
+      textAlign(CENTER);
+      textSize(this.r / 3);
+      var r = parseFloat(this.r).toFixed(2);
+      text(r, this.pos.x, this.pos.y+this.r/12);
     }
   }
 
@@ -58,6 +64,11 @@ class Blob {
     var distance = p5.Vector.dist(this.pos, otherBlob.pos);
     if(distance < this.r + otherBlob.r){//if they collided
       if(this.r * this.marginToBeEaten > otherBlob.r){//if me is big enough
+        if(otherBlob.r >= initialSize){//if was enemy
+          eaten_enemy.play();
+        }else{
+          pop_sound.play(0,1,3); //play sound
+        }
         //A = pi * r^2
         //r = sqrt(A/pi)
         var myArea = PI * this.r * this.r;

@@ -13,8 +13,14 @@ var initiated = false; //gets set to true, after first heartbeat
 var constrainX;
 var constrainY;
 
+function preload(){
+      background_music = loadSound('assets/background_music.mp3');
+      pop_sound = loadSound('assets/pop_sound.mp3');
+      eaten_enemy = loadSound("assets/eaten_enemy.mp3")
+}
 function setup() {
-  var canvas = createCanvas(600, 600);
+
+  var canvas = createCanvas(900, 600);
   canvas.parent('canvas_container'); //put canvas in its html div container
   c = 4;
   constrainX = width/c;
@@ -50,7 +56,7 @@ function setup() {
   }
   );
 
-
+  background_music.loop(0,1,0.1);//start music
 }
 
 function draw() {
@@ -74,14 +80,9 @@ function draw() {
 
     translate(-blob.pos.x, -blob.pos.y); //make world move i think
 
-
     showFoodAndBlobs();
 
-
-
     setFood(); //set food, so that always same amount of food available
-
-
 
     blob.show(); //me
     if (mouseIsPressed) {
