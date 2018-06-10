@@ -4,7 +4,7 @@ var blob;
 var blobs = [];
 var food = [];
 
-var totalFoodValue = 75;
+var totalFoodValue = 150;
 var initialSize = 12;
 var marginToBeEaten = 0.8;
 
@@ -25,7 +25,7 @@ function setup() {
   var canvas = createCanvas(900, 600);
   canvas.parent('canvas_container'); //put canvas in its html div container
 
-  c = 4;
+  c = 2;
   constrainX = width/c;
   constrainY = height/c;
   //set food:
