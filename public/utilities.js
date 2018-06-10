@@ -70,7 +70,9 @@ function readPort(){
   xmlhttp.onreadystatechange = function(){
     if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
       txt = xmlhttp.responseText;
-      return(txt);
+      port = txt; //set port in sketch
+      console.log(port);
+      setupSocket();
     }
   };
   xmlhttp.open("GET","port.txt",true);

@@ -1,4 +1,6 @@
 var socket;
+var port;
+
 var blob;
 var blobs = [];
 var food = [];
@@ -18,55 +20,53 @@ function preload(){
       pop_sound = loadSound('assets/pop_sound.mp3');
       eaten_enemy = loadSound("assets/eaten_enemy.mp3")
 }
+
 function setup() {
-
-
+  port = readPort();
   var canvas = createCanvas(900, 600);
   canvas.parent('canvas_container'); //put canvas in its html div container
+
   c = 4;
   constrainX = width/c;
   constrainY = height/c;
-
-  // Start a socket connection to the server
-  // Some day we would run this server somewhere else
-  var port = readPort();
-  console.log(port);
-  if(port == undefined){
-    port = 4000;
-  }
-  console.log(port);
-  socket = io.connect('http://localhost:'+port);
-
   //set food:
   setFood();
-
-
-  socket.on('heartbeat',
-    function(data) {
-      blobs = [];
-      for(i = 0; i<data.length;i++){
-        blobs.push(new Blob(false, data[i].id, data[i].x,data[i].y,data[i].r));// not me
-      }
-      //if was initial, now is not anymore
-      if(initiated != null && !initiated){
-        initiated = true;
-      }
-    }
-  );
-
-  socket.on('gameOver',
-    function(id) {
-      if(id == blob.id){
-        var canvas = document.getElementById('canvas_container');
-        canvas.style.visibility = 'hidden';
-    }
-  }
-  );
 
   background_music.loop(0,1,0.1);//start music
 }
 
+function setupSocket(){
+    // Start a socket connection to the server
+    socket = io.connect('http://localhost:'+port);
+
+
+    socket.on('heartbeat',
+      function(data) {
+        blobs = [];
+        for(i = 0; i<data.length;i++){
+          blobs.push(new Blob(false, data[i].id, data[i].x,data[i].y,data[i].r));// not me
+        }
+        //if was initial, now is not anymore
+        if(initiated != null && !initiated){
+          initiated = true;
+        }
+      }
+    );
+
+    socket.on('gameOver',
+      function(id) {
+        if(id == blob.id){
+          var canvas = document.getElementById('canvas_container');
+          canvas.style.visibility = 'hidden';
+      }
+    }
+    );
+}
+
 function draw() {
+  if(socket == undefined){
+    return;
+  }
   //if blobs arrived by heartbeat, now initialize me
   if(initiated != null && initiated){
     initialiseMyself();

@@ -16,12 +16,16 @@ var app = express();
 
 // Set up the server
 // process.env.PORT is related to deploying on heroku
+var port = process.env.PORT;
+if(port == undefined){
+  port = 4000;
+}
 
-fs.writeFile('public/port.txt', process.env.PORT, (err) => {
+fs.writeFile('public/port.txt', port , (err) => {
   if (err) throw err;
   console.log('The file has been saved! '+process.env.PORT);
 });
-var server = app.listen(process.env.PORT || 4000,'0.0.0.0', listen);
+var server = app.listen(port,'0.0.0.0', listen);
 
 // This call back just tells us that the server has started
 function listen() {
