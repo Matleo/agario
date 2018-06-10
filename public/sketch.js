@@ -20,6 +20,7 @@ function preload(){
 }
 function setup() {
 
+
   var canvas = createCanvas(900, 600);
   canvas.parent('canvas_container'); //put canvas in its html div container
   c = 4;
@@ -28,7 +29,12 @@ function setup() {
 
   // Start a socket connection to the server
   // Some day we would run this server somewhere else
-  socket = io.connect('http://localhost:30000');
+  var port = readPort();
+  if(port == undefined){
+    port = 4000;
+  }
+  console.log(port);
+  socket = io.connect('http://localhost:'+port);
 
   //set food:
   setFood();

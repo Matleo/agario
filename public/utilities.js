@@ -63,3 +63,16 @@ function showFoodAndBlobs(){
     }
   }
 }
+
+function readPort(){
+  var txt = "";
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function(){
+    if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
+      txt = xmlhttp.responseText;
+      return(txt);
+    }
+  };
+  xmlhttp.open("GET","port.txt",true);
+  xmlhttp.send();
+}

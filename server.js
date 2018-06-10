@@ -9,13 +9,19 @@ function Blob(id, x, y, r) {
 
 // Using express: http://expressjs.com/
 var express = require('express');
+const fs = require('fs');
+
 // Create the app
 var app = express();
 
 // Set up the server
 // process.env.PORT is related to deploying on heroku
 
-var server = app.listen(30000,'0.0.0.0', listen);
+fs.writeFile('public/port.txt', process.env.PORT, (err) => {
+  if (err) throw err;
+  console.log('The file has been saved!');
+});
+var server = app.listen(process.env.PORT || 4000,'0.0.0.0', listen);
 
 // This call back just tells us that the server has started
 function listen() {
