@@ -30,6 +30,7 @@ function setup() {
   // Start a socket connection to the server
   // Some day we would run this server somewhere else
   var port = readPort();
+  console.log(port);
   if(port == undefined){
     port = 4000;
   }
