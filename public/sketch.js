@@ -1,12 +1,12 @@
 var socket;
 
-var blob;
-var blobs = [];
+var blob; //me
+var blobs = []; //enemys+me (from server)
 var food = [];
+var bots = [];
 
-var totalFoodValue = 150;
+var totalFoodValue;
 var initialSize = 12;
-var marginToBeEaten = 0.8;
 
 var zoom = 1;
 var initiated = false; //gets set to true, after first heartbeat
@@ -18,6 +18,8 @@ function preload(){
       background_music = loadSound('assets/background_music.mp3');
       pop_sound = loadSound('assets/pop_sound.mp3');
       eaten_enemy = loadSound("assets/eaten_enemy.mp3")
+
+      background_image = loadImage("assets/sky-background.jpg");
 }
 
 function setup() {
@@ -28,6 +30,7 @@ function setup() {
   c = 2;
   constrainX = width/c;
   constrainY = height/c;
+  totalFoodValue = 500/c;
   //set food:
   setFood();
 
@@ -39,6 +42,7 @@ function draw() {
   if(socket == undefined){
     return;
   }
+
   //if blobs arrived by heartbeat, now initialize me
   if(initiated != null && initiated){
     initialiseMyself();
@@ -50,7 +54,7 @@ function draw() {
       blob.id = socket.id;
     }
 
-    background(0);
+    background(background_image);
     translate(width / 2, height / 2);
 
     var newzoom = 64 / blob.r;

@@ -8,7 +8,7 @@ function setFood() {
   }
   var iterations = totalFoodValue - currentValue; //how many new Blobs with avg of 1 will be created
   for (i = 0; i < iterations/2; i++) {
-    var newBlob = new Blob(false, null, random(-constrainX,constrainX-1),random(-constrainY,constrainY-1),random(1,3));
+    var newBlob = new Blob("food", null, random(-constrainX,constrainX-1),random(-constrainY,constrainY-1),random(1,3));
     food.push(newBlob);
   }
 }
@@ -33,12 +33,14 @@ function initialiseMyself(){
   var initialCoordinates = getNonCollidingCoordinates(3);//how far away
   var x = initialCoordinates[0];
   var y = initialCoordinates[1];
-  blob = new Blob(true, null, x , y, initialSize);// its me
+  blob = new Blob("me", null, x , y, initialSize);// its me
   initiated = null;
+  var maybeBotCoordinates = getNonCollidingCoordinates(3);  //new coordinates, that could be used  for a bot
   var data = {
     x: blob.pos.x,
     y: blob.pos.y,
-    r: blob.r
+    r: blob.r,
+    botCoordinates: maybeBotCoordinates
   };
   socket.emit('start', data);
 }
@@ -72,8 +74,13 @@ function setupSocket(){
     socket.on('heartbeat',
       function(data) {
         blobs = [];
-        for(i = 0; i<data.length;i++){
-          blobs.push(new Blob(false, data[i].id, data[i].x,data[i].y,data[i].r));// not me
+        for(i = 0; i<data.blobs.length;i++){
+          blobs.push(new Blob("enemy", data.blobs[i].id, data.blobs[i].x,data.blobs[i].y,data.blobs[i].r));// not me
+        }
+        bots = [];
+        for(i = 0; i<data.bots.length;i++){
+          var myBot = data.bots[i];
+          bots.push(new Bot(myBot.id, myBot.x, myBot.y,myBot.type));
         }
         //if was initial, now is not anymore
         if(initiated != null && !initiated){

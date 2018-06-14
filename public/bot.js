@@ -1,19 +1,12 @@
-class Blob {
-  constructor(type, id, x, y, r){
+class Bot {
+  constructor(id, x, y, type){
     this.type = type; //is it the user's Blob or some other from server.  false true
     this.id = id;
     this.pos = createVector(x, y);
-    this.r = r;
-
-    this.counter = 0;
-    this.oldWobble = [this.r*2,this.r*2]; //store wobble sizes here
-    this.wobbleSize = 0.002; //how much wobble
-
-    this.vel = createVector(0, 0);
-    this.marginToBeEaten = 0.8;
   }
 
-  update() {
+//TODO:Implement all functionality
+  update(mvX, mvY) {
     var newvel = createVector(mouseX - width / 2, mouseY - height / 2);
     newvel.div(100);
     //newvel.setMag(3);

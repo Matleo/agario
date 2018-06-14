@@ -1,10 +1,21 @@
 var blobs = [];
-
+var bots = [];
 function Blob(id, x, y, r) {
   this.id = id;
   this.x = x;
   this.y = y;
   this.r = r;
+}
+function Bot(id, x, y, type) {
+  this.id = id;
+  this.x = x;
+  this.y = y;
+  this.type = type;
+}
+function addBot(botId,coordinates,type){
+  var x = coordinates[0];
+  var y = coordinates[1];
+  bots.push(new Bot(botId,x,y,type));
 }
 
 // Using express: http://expressjs.com/
@@ -36,10 +47,11 @@ app.use(express.static('public'));
 // WebSockets work with the HTTP server
 var io = require('socket.io')(server);
 
-setInterval(heartbeat, 33); //call the function every n miliseconds
+setInterval(heartbeat, 66); //call the function every n miliseconds
 
 function heartbeat() {
-  io.sockets.emit('heartbeat', blobs);
+  var data = {blobs:blobs,bots:bots};
+  io.sockets.emit('heartbeat', data);
 }
 
 
@@ -58,6 +70,10 @@ io.sockets.on('connection',
         console.log(socket.id + ": " + data.x + " " + data.y + " " + data.r);
         var blob = new Blob(socket.id, data.x, data.y, data.r);
         blobs.push(blob);
+
+        var botType = "default";
+        var botId = socket.id + "-"+botType;
+        addBot(botId, botType, data.botCoordinates);
       }
     );
 
