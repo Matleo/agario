@@ -3,12 +3,12 @@
 function setFood() {
   var currentValue = 0;
   for (i = 0; i < food.length; i++) {
-    var blob = food[i];
-    currentValue += blob.r;
+    var myFood = food[i];
+    currentValue += myFood.r;
   }
   var iterations = totalFoodValue - currentValue; //how many new Blobs with avg of 1 will be created
   for (i = 0; i < iterations/2; i++) {
-    var newBlob = new Blob("food", null, random(-constrainX,constrainX-1),random(-constrainY,constrainY-1),random(1,3));
+    var newBlob = new Blob("food", null, random(-constrainX,constrainX-1),random(-constrainY,constrainY-1),random(1,3),foodShape);
     food.push(newBlob);
   }
 }
@@ -33,7 +33,7 @@ function initialiseMyself(){
   var initialCoordinates = getNonCollidingCoordinates(3);//how far away
   var x = initialCoordinates[0];
   var y = initialCoordinates[1];
-  blob = new Blob("me", null, x , y, initialSize);// its me
+  blob = new Blob("me", null, x , y, initialSize, null, sprite_image);// its me
   initiated = null;
   var maybeBotCoordinates = getNonCollidingCoordinates(3);  //new coordinates, that could be used  for a bot
   var data = {
@@ -46,8 +46,10 @@ function initialiseMyself(){
 }
 
 function showFoodAndBlobs(){
+  var totalValue = 0;
   for (i = food.length - 1; i >= 0; i--) {
     food[i].show();
+    totalValue+=food[i].r;
     if (blob.eats(food[i])) {
        food.splice(i, 1);
     }

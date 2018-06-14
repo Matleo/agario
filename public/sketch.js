@@ -6,6 +6,7 @@ var food = [];
 var bots = [];
 
 var totalFoodValue;
+var foodShape; //make food look different
 var initialSize = 12;
 
 var zoom = 1;
@@ -14,12 +15,14 @@ var initiated = false; //gets set to true, after first heartbeat
 var constrainX;
 var constrainY;
 
+
 function preload(){
       background_music = loadSound('assets/background_music.mp3');
       pop_sound = loadSound('assets/pop_sound.mp3');
       eaten_enemy = loadSound("assets/eaten_enemy.mp3")
 
       background_image = loadImage("assets/sky-background.jpg");
+      sprite_image = loadImage("assets/sprite.jpg");
 }
 
 function setup() {
@@ -31,6 +34,7 @@ function setup() {
   constrainX = width/c;
   constrainY = height/c;
   totalFoodValue = 500/c;
+  foodShape = random(0,4000);
   //set food:
   setFood();
 

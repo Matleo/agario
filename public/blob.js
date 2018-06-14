@@ -1,16 +1,22 @@
 class Blob {
-  constructor(type, id, x, y, r){
+  constructor(type, id, x, y, r, foodRandomNumber, image){
     this.type = type; //is it the user's Blob or some other from server.  false true
     this.id = id;
+    this.vel = createVector(0, 0);
     this.pos = createVector(x, y);
     this.r = r;
+    this.image = image;
 
     this.counter = 0;
-    this.oldWobble = [this.r*2,this.r*2]; //store wobble sizes here
-    this.wobbleSize = 0.002; //how much wobble
+    this.wobble = [this.r*2,this.r*2]; //store wobble sizes here
+    this.wobbleStrength = 0.003; //how much wobble
+    this.wobbleCount = 0; //how long to wobble
 
-    this.vel = createVector(0, 0);
+    this.scribble = new Scribble();
+    this.foodRandomNumber = foodRandomNumber;//to make food look different each game
+
     this.marginToBeEaten = 0.8;
+
   }
 
   update() {
@@ -40,37 +46,45 @@ class Blob {
   }
 
   show() {
-    this.counter++;
-    if(this.type =="me"){
-        fill(255);
-        stroke("red");
-    }else if(this.type == "food"){//if food
-        fill(0,255,0);
-        noStroke();
-    }else{//if enemy
-        fill(0, 0, 255);
-    }
-    if(this.counter%3 ==0){ //only wobble every nth time
-      var wobble = this.doWobbling(this.r*2);
-      this.oldWobble = wobble;
-    }else{
-      var wobble = this.oldWobble;
-    }
-    ellipse(this.pos.x, this.pos.y, wobble[0],wobble[1]);
 
-    if(this.type == "enemy"){
-      noStroke();
+
+    if(this.type =="me"){
+      this.counter++;
+      if(this.wobbleCount>0 && this.counter % 3 ==0){ //only wobble every nth time
+        this.wobble = this.doWobbling(this.r*2);
+        this.wobbleCount--;
+      }else{
+        this.wobble = [this.r*2,this.r*2];
+      }
+
       fill(255);
-      textAlign(CENTER);
-      textSize(4);
-      text(this.id, this.pos.x, this.pos.y + this.r);
-    }else if(this.type=="me"){
+      stroke("red");
+      /*imageMode(CENTER);
+      image(this.image,this.pos.x, this.pos.y, this.wobble[0],this.wobble[1]);
+      imageMode(CORNER);*/
+      ellipse(this.pos.x, this.pos.y, this.wobble[0],this.wobble[1]);
+
       noStroke();
       fill(0);
       textAlign(CENTER);
       textSize(this.r / 3);
       var r = parseFloat(this.r).toFixed(2);
       text(r, this.pos.x, this.pos.y+this.r/12);
+    }else if(this.type == "food"){//if food
+      fill(0,255,0);
+      noStroke();
+      randomSeed(this.foodRandomNumber);
+      this.scribble.scribbleEllipse(this.pos.x, this.pos.y, this.r*2,this.r*2);
+    }else{//if enemy
+      fill(0, 0, 255);
+      stroke("red");
+      ellipse(this.pos.x, this.pos.y, this.r*2,this.r*2);
+
+      noStroke();
+      fill(255);
+      textAlign(CENTER);
+      textSize(4);
+      text(this.id, this.pos.x, this.pos.y + this.r);
     }
   }
 
@@ -83,6 +97,7 @@ class Blob {
           eaten_enemy.play();
         }else{
           pop_sound.play(0,1,3); //play sound
+          this.wobbleCount = 20;
         }
         //A = pi * r^2
         //r = sqrt(A/pi)
@@ -102,15 +117,16 @@ class Blob {
   }
 
   doWobbling(d){
+    randomSeed(new Date().getTime());
     var wobbleBy = random(2,30); //values do grow in size, after modBy iterations, it repeats
     var rndSplit = random(0,1); //decides wheter to grow in width or height
-    var actualWobbleSize = wobbleBy * (this.wobbleSize*this.r);
+    var wobbleSize = wobbleBy * (this.wobbleStrength*this.r);
     if(rndSplit <= 0.5){
-      var wid = d + actualWobbleSize;;
-      var hei = d - actualWobbleSize;
+      var wid = d + wobbleSize;;
+      var hei = d - wobbleSize;
     }else{
-      var wid = d - actualWobbleSize;
-      var hei = d + actualWobbleSize;
+      var wid = d - wobbleSize;
+      var hei = d + wobbleSize;
     }
     return([wid,hei]);
   }
