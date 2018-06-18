@@ -6,16 +6,27 @@ function Blob(id, x, y, r) {
   this.y = y;
   this.r = r;
 }
-function Bot(id, x, y, type) {
-  this.id = id;
+function Bot(botID,x, y, type, owner) {
+  this.id = botID;
   this.x = x;
   this.y = y;
   this.type = type;
+  this.owner = owner;
+
+  var initX = Math.random()*2-1;
+  var initY = Math.random()*2-1;
+  if(initX<0.25&&initX>=0){initX+=0.25;}
+  if(initX>-0.25&&initX<0){initX-=0.25;}
+  if(initY<0.25&&initY>=0){initY+=0.25;}
+  if(initY>-0.25&&initY<0){initY-=0.25;}
+  this.directionX = 0.9;
+  this.directionY = 0.8;
 }
-function addBot(botId,coordinates,type){
+function addBot(type, coordinates, socketId){
   var x = coordinates[0];
   var y = coordinates[1];
-  bots.push(new Bot(botId,x,y,type));
+  var botID = socketId + "_"+type;
+  bots.push(new Bot(botID,x,y,type,socketId));
 }
 
 // Using express: http://expressjs.com/
@@ -67,23 +78,18 @@ io.sockets.on('connection',
 
     socket.on('start',
       function(data) {
-        console.log(socket.id + ": " + data.x + " " + data.y + " " + data.r);
         var blob = new Blob(socket.id, data.x, data.y, data.r);
         blobs.push(blob);
-
-        var botType = "default";
-        var botId = socket.id + "-"+botType;
-        addBot(botId, botType, data.botCoordinates);
       }
     );
 
     socket.on('update',
       function(data) {
-        //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
+        //update blob
         var blob;
         for (var i = 0; i < blobs.length; i++) {
           if (socket.id == blobs[i].id) {
-            blob = blobs[i];
+            blob = blobs[i]; //set pointer
           }
         }
         if(blob != null){//might be null, due to asynchronous clientEaten callback
@@ -91,6 +97,28 @@ io.sockets.on('connection',
           blob.y = data.y;
           blob.r = data.r;
         }
+
+        //if this is first
+        if(bots.length == 0){
+          addBot("schnatz", data.botCoordinates[0],socket.id);
+        }
+        //update his bots
+        var hisBots = data.myBots;
+        for(i=0;i<hisBots.length;i++){
+          var hisBot = hisBots[i];
+          for(j=0;j<bots.length;j++){
+            //find the bot in array:
+            if(hisBot.id==bots[j].id){
+              bots[j].x = hisBot.x;
+              bots[j].y = hisBot.y;
+              bots[j].directionX = hisBot.directionX;
+              bots[j].directionY = hisBot.directionY;
+
+            }
+          }
+        }
+
+
       }
     );
 
@@ -106,6 +134,17 @@ io.sockets.on('connection',
       }
     );
 
+    socket.on('botEaten',
+      function(id) {
+        console.log("Server: Bot ("+id+") got eaten.");
+        for(i=0; i<bots.length;i++){
+          if(bots[i].id == id){
+            bots.splice(i,1);
+          }
+        }
+      }
+    );
+
 
 
     socket.on('disconnect', function() {
@@ -113,6 +152,10 @@ io.sockets.on('connection',
         if (socket.id == blobs[i].id) {
           blobs.splice(i,1);
         }
+      }
+      //if no players here, delete bots
+      if(blobs.length==0){
+        bots = [];
       }
       console.log("Client "+socket.id+" has disconnected");
     });

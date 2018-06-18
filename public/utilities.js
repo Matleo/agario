@@ -1,20 +1,6 @@
-
-//sets the amount of Food, so that to all time, the current amount of food is near the totalFoodValue
-function setFood() {
-  var currentValue = 0;
-  for (i = 0; i < food.length; i++) {
-    var myFood = food[i];
-    currentValue += myFood.r;
-  }
-  var iterations = totalFoodValue - currentValue; //how many new Blobs with avg of 1 will be created
-  for (i = 0; i < iterations/2; i++) {
-    var newBlob = new Blob("food", null, random(-constrainX,constrainX-1),random(-constrainY,constrainY-1),random(1,3),foodShape);
-    food.push(newBlob);
-  }
-}
-
 //searches for spawn coordninates, minunits away from existing
 function getNonCollidingCoordinates(minunits){
+  randomSeed(new Date().getTime());
   var x = random(-constrainX,constrainX-1);
   var y = random(-constrainY,constrainY-1);
   for(i = 0; i<blobs.length;i++){
@@ -29,32 +15,62 @@ function getNonCollidingCoordinates(minunits){
   return result;
 }
 
+function updateBot(bot, newBot){
+  bot.pos.x = newBot.x;
+  bot.pos.y = newBot.y;
+  bot.direction.x = newBot.directionX;
+  bot.direction.y = newBot.directionY;
+}
+
+//sets the amount of Food, so that to all time, the current amount of food is near the totalFoodValue
+function setFood() {
+  randomSeed(new Date().getTime());
+  var currentValue = 0;
+  for (i = 0; i < food.length; i++) {
+    var myFood = food[i];
+    currentValue += myFood.r;
+  }
+  var iterations = totalFoodValue - currentValue; //how many new Blobs with avg of 1 will be created
+  for (i = 0; i < iterations/2; i++) {
+    var x = random(-constrainX,constrainX-1);
+    var y = random(-constrainY,constrainY-1);
+    var size = random(0.2,2);
+    var newBlob = new Blob("food", null, x,y,size,foodShape);
+    food.push(newBlob);
+  }
+}
+
+
 function initialiseMyself(){
   var initialCoordinates = getNonCollidingCoordinates(3);//how far away
   var x = initialCoordinates[0];
   var y = initialCoordinates[1];
-  blob = new Blob("me", null, x , y, initialSize, null, sprite_image);// its me
+  blob = new Blob("me", null, x , y, initialSize, null, constrainX, constrainY);// its me
   initiated = null;
-  var maybeBotCoordinates = getNonCollidingCoordinates(3);  //new coordinates, that could be used  for a bot
   var data = {
     x: blob.pos.x,
     y: blob.pos.y,
-    r: blob.r,
-    botCoordinates: maybeBotCoordinates
+    r: blob.r
   };
   socket.emit('start', data);
 }
 
-function showFoodAndBlobs(){
-  var totalValue = 0;
+function showFoodAndBlobsAndBots(){
+  //food:
   for (i = food.length - 1; i >= 0; i--) {
     food[i].show();
-    totalValue+=food[i].r;
     if (blob.eats(food[i])) {
        food.splice(i, 1);
     }
   }
-
+  //bots:
+  for (i = bots.length - 1; i >= 0; i--) {
+    bots[i].update();
+    if (blob.eats(bots[i])) {
+       bots.splice(i, 1);
+    }
+  }
+//blobs
   for (i = blobs.length - 1; i >= 0; i--) {
     var id = blobs[i].id;
     if (id !== socket.id) {// to not show and eat myself
@@ -75,14 +91,34 @@ function setupSocket(){
 
     socket.on('heartbeat',
       function(data) {
+        //update blobs
         blobs = [];
         for(i = 0; i<data.blobs.length;i++){
           blobs.push(new Blob("enemy", data.blobs[i].id, data.blobs[i].x,data.blobs[i].y,data.blobs[i].r));// not me
         }
-        bots = [];
-        for(i = 0; i<data.bots.length;i++){
-          var myBot = data.bots[i];
-          bots.push(new Bot(myBot.id, myBot.x, myBot.y,myBot.type));
+
+        //set bots initially
+        if(data.bots.length != bots.length){
+          bots = [];
+          for(i = 0; i<data.bots.length;i++){
+            var myBot = data.bots[i];
+            if(myBot.owner == socket.id){
+              bots.push(new Bot(myBot.id, myBot.x, myBot.y, myBot.type, constrainX, constrainY, true, myBot.directionX, myBot.directionY));
+            }else{
+              bots.push(new Bot(myBot.id, myBot.x, myBot.y, myBot.type, constrainX, constrainY, false, myBot.directionX, myBot.directionY));
+            }
+          }
+        }else{//or update bots (without deleting them)
+          for(i = 0; i<data.bots.length;i++){
+            var myBot = data.bots[i];
+            for(j=0; j<bots.length;j++){
+              //search for this bot
+              if(bots[j].id == myBot.id){
+                updateBot(bots[j],myBot);//set x,y and directions
+                break;
+              }
+            }
+          }
         }
         //if was initial, now is not anymore
         if(initiated != null && !initiated){
@@ -94,9 +130,19 @@ function setupSocket(){
     socket.on('gameOver',
       function(id) {
         if(id == blob.id){
-          var canvas = document.getElementById('canvas_container');
-          canvas.style.visibility = 'hidden';
+          die();
       }
     }
     );
+}
+
+function die(){
+  var canvas = document.getElementById('canvas_container');
+  canvas.style.visibility = 'hidden';
+
+  var score_parent = document.getElementById('score_parent');
+  score_parent.style.visibility = 'visible';
+
+  var reconnect = document.getElementById('reconnect');
+  reconnect.style.visibility = 'visible';
 }

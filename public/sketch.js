@@ -7,7 +7,7 @@ var bots = [];
 
 var totalFoodValue;
 var foodShape; //make food look different
-var initialSize = 12;
+var initialSize = 10;
 
 var zoom = 1;
 var initiated = false; //gets set to true, after first heartbeat
@@ -20,6 +20,7 @@ function preload(){
       background_music = loadSound('assets/background_music.mp3');
       pop_sound = loadSound('assets/pop_sound.mp3');
       eaten_enemy = loadSound("assets/eaten_enemy.mp3")
+      schnatz_sound = loadSound("assets/schnatz_sound.mp3");
 
       background_image = loadImage("assets/sky-background.jpg");
       sprite_image = loadImage("assets/sprite.jpg");
@@ -33,7 +34,7 @@ function setup() {
   c = 2;
   constrainX = width/c;
   constrainY = height/c;
-  totalFoodValue = 500/c;
+  totalFoodValue = 400/c;
   foodShape = random(0,4000);
   //set food:
   setFood();
@@ -67,7 +68,7 @@ function draw() {
 
     translate(-blob.pos.x, -blob.pos.y); //make world move i think
 
-    showFoodAndBlobs();
+    showFoodAndBlobsAndBots();
 
     setFood(); //set food, so that always same amount of food available
 
@@ -75,12 +76,28 @@ function draw() {
     if (mouseIsPressed) {
       blob.update();
     }
-    blob.constrain(constrainX, constrainY);
 
+
+    //send all bots that i have ownership of
+    var myBots = [];
+    for(i=0; i<bots.length;i++){
+      if(bots[i].owner){
+        var myBot = bots[i];
+        myBots.push({
+                    id:myBot.id,
+                    x:myBot.pos.x,
+                    y:myBot.pos.y,
+                    directionX:myBot.direction.x,
+                    directionY:myBot.direction.y});
+      }
+    }
+    var maybeBotCoordinates = [getNonCollidingCoordinates(10),getNonCollidingCoordinates(10),getNonCollidingCoordinates(10)];  //new coordinates, that could be used  for a bot
     var data = {
       x: blob.pos.x,
       y: blob.pos.y,
-      r: blob.r
+      r: blob.r,
+      myBots: myBots,
+      botCoordinates: maybeBotCoordinates
     };
     socket.emit('update', data);
   }

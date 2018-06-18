@@ -1,110 +1,55 @@
 class Bot {
-  constructor(id, x, y, type){
-    this.type = type; //is it the user's Blob or some other from server.  false true
+  constructor(id, x, y, type, constrainX, constrainY, owner, directionX, directionY){
     this.id = id;
+    this.type = type;
     this.pos = createVector(x, y);
+    this.direction = createVector(directionX, directionY); //is always between [-1,-0.25] or [0.25,1]
+    this.r = 5;
+    this.constrainX = constrainX;
+    this.constrainY = constrainY;
+    this.owner = owner; //am i the owner?
   }
 
-//TODO:Implement all functionality
-  update(mvX, mvY) {
-    var newvel = createVector(mouseX - width / 2, mouseY - height / 2);
-    newvel.div(100);
-    //newvel.setMag(3);
-    newvel.limit(3);
-    this.vel.lerp(newvel, 0.2); //grow slowly (0.2) to the newvel
-    this.pos.add(this.vel);
+  move() {
+    var newvel = Object.assign(this.direction);
+    newvel.mult(2.5);
+    newvel.limit(3.5);
+    this.pos.add(newvel);
   }
 
 
   //dont allow blobs to run out of boundaries
-  constrain(constrainX, constrainY) {
-    if(this.pos.x + this.r > constrainX){ //if x_over
-      this.pos.x = constrainX - this.r;
-    }else if(this.pos.x - this.r < -constrainX){ //if x_under
-      this.pos.x = -constrainX + this.r;
+  constrain() {
+    var newX = Math.random()*2-1;
+    var newY = Math.random()*2-1;
+    if(newX<0.25&&newX>=0){newX+=0.25;}
+    if(newX>-0.25&&newX<0){newX-=0.25;}
+    if(newY<0.25&&newY>=0){newY+=0.25;}
+    if(newY>-0.25&&newY<0){newY-=0.25;}
+    if(this.pos.x + this.r > this.constrainX){ //if x_over
+      this.pos.x = this.constrainX - this.r;
+      this.direction = createVector(newX,newY);//change direction to not get stuck on wall
+    }else if(this.pos.x - this.r < -this.constrainX){ //if x_under
+      this.pos.x = -this.constrainX + this.r;
+      this.direction = createVector(newX,newY);//change direction to not get stuck on wall
     }
 
-    if(this.pos.y + this.r > constrainY){//if y_over
-        this.pos.y = constrainY - this.r;
-    }else if(this.pos.y - this.r < -constrainY){//if y_under
-        this.pos.y = -constrainY + this.r;
+    if(this.pos.y + this.r > this.constrainY){//if y_over
+      this.pos.y = this.constrainY - this.r;
+      this.direction = createVector(newX,newY);//change direction to not get stuck on wall
+    }else if(this.pos.y - this.r < -this.constrainY){//if y_under
+      this.pos.y = -this.constrainY + this.r;
+      this.direction = createVector(newX,newY);//change direction to not get stuck on wall
     }
 
   }
 
-  show() {
-    this.counter++;
-    if(this.type =="me"){
-        fill(255);
-        stroke("red");
-    }else if(this.type == "food"){//if food
-        fill(0,255,0);
-        noStroke();
-    }else{//if enemy
-        fill(0, 0, 255);
-    }
-    if(this.counter%3 ==0){ //only wobble every nth time
-      var wobble = this.doWobbling(this.r*2);
-      this.oldWobble = wobble;
-    }else{
-      var wobble = this.oldWobble;
-    }
-    ellipse(this.pos.x, this.pos.y, wobble[0],wobble[1]);
-
-    if(this.type == "enemy"){
-      noStroke();
-      fill(255);
-      textAlign(CENTER);
-      textSize(4);
-      text(this.id, this.pos.x, this.pos.y + this.r);
-    }else if(this.type=="me"){
-      noStroke();
-      fill(0);
-      textAlign(CENTER);
-      textSize(this.r / 3);
-      var r = parseFloat(this.r).toFixed(2);
-      text(r, this.pos.x, this.pos.y+this.r/12);
-    }
+  update() {
+    this.constrain();
+    this.move();
+    stroke("black");
+    fill("yellow");
+    ellipse(this.pos.x, this.pos.y, this.r*2);
   }
 
-  //otherBlob has to be off a margin smaller, to be eaten
-  eats(otherBlob){
-    var distance = p5.Vector.dist(this.pos, otherBlob.pos);
-    if(distance < this.r + otherBlob.r){//if they collided
-      if(this.r * this.marginToBeEaten > otherBlob.r){//if me is big enough
-        if(otherBlob.r >= initialSize){//if was enemy
-          eaten_enemy.play();
-        }else{
-          pop_sound.play(0,1,3); //play sound
-        }
-        //A = pi * r^2
-        //r = sqrt(A/pi)
-        var myArea = PI * this.r * this.r;
-        var otherArea = PI * otherBlob.r * otherBlob.r;
-        this.r = sqrt((myArea+otherArea) / PI);
-        return true;
-      }else{//block each other off
-        var moveBack = p5.Vector.sub( this.pos,otherBlob.pos);
-        moveBack.div(3);
-        moveBack.limit(3);
-        this.vel.lerp(moveBack, 0.2); //grow slowly  to the vector "moveBack"
-        this.pos.add(this.vel);
-      }
-    }
-    return false;
-  }
-
-  doWobbling(d){
-    var wobbleBy = random(2,30); //values do grow in size, after modBy iterations, it repeats
-    var rndSplit = random(0,1); //decides wheter to grow in width or height
-    var actualWobbleSize = wobbleBy * (this.wobbleSize*this.r);
-    if(rndSplit <= 0.5){
-      var wid = d + actualWobbleSize;;
-      var hei = d - actualWobbleSize;
-    }else{
-      var wid = d - actualWobbleSize;
-      var hei = d + actualWobbleSize;
-    }
-    return([wid,hei]);
-  }
 }
