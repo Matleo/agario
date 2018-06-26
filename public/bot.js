@@ -6,7 +6,7 @@ class Bot {
     this.direction = createVector(directionX, directionY); //is always between [-1,-0.25] or [0.25,1]
     if(this.type=="schnatz"){
       this.r = 5;
-      this.speed = 3.5;
+      this.speed = 1.5;//3.5
     }else if(this.type=="default"){
       this.r = 4; //will be displayed with double size
       this.sizeIncrease=2;
