@@ -64,11 +64,12 @@ function showFoodAndBlobsAndBots(){
     }
   }
   //bots:
-  for (i = bots.length - 1; i >= 0; i--) {
-    bots[i].update();
-    if (blob.eats(bots[i])) {
-      socket.emit('botEaten', bots[i].id);
-      bots.splice(i, 1);
+  for (j = bots.length - 1; j >= 0; j--) {
+    var myBot = bots[j];
+    myBot.update();
+    if (blob.eats(myBot)) {
+      socket.emit('botEaten', myBot.id);
+      bots.splice(j, 1);
     }
   }
 //blobs
