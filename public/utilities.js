@@ -16,10 +16,12 @@ function getNonCollidingCoordinates(minunits){
 }
 
 function updateBot(bot, newBot){
-  bot.pos.x = newBot.x;
-  bot.pos.y = newBot.y;
-  bot.direction.x = newBot.directionX;
-  bot.direction.y = newBot.directionY;
+  if(bot.direction.x != newBot.direction.x | bot.direction.y != newBot.direction.y){
+    bot.pos.x = newBot.x;
+    bot.pos.y = newBot.y;
+    bot.direction.x = newBot.directionX;
+    bot.direction.y = newBot.directionY;
+  }
 }
 
 //sets the amount of Food, so that to all time, the current amount of food is near the totalFoodValue
