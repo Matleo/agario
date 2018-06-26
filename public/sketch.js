@@ -30,7 +30,7 @@ function setup() {
   var canvas = createCanvas(1800, 900);
   canvas.parent('canvas_container'); //put canvas in its html div container
 
-  c = 8;
+  c = 4;
   constrainX = width/c;
   constrainY = height/c;
   totalFoodValue = 3000/(c*c);
@@ -77,12 +77,25 @@ function draw() {
     }
 
 
-    //send update
+    //send all bots that i have ownership of
+    var myBots = [];
+    for(i=0; i<bots.length;i++){
+      if(bots[i].owner){
+        var myBot = bots[i];
+        myBots.push({
+                    id:myBot.id,
+                    x:myBot.pos.x,
+                    y:myBot.pos.y,
+                    directionX:myBot.direction.x,
+                    directionY:myBot.direction.y});
+      }
+    }
     var maybeBotCoordinates = [getNonCollidingCoordinates(10),getNonCollidingCoordinates(10),getNonCollidingCoordinates(10)];  //new coordinates, that could be used  for a bot
     var data = {
       x: blob.pos.x,
       y: blob.pos.y,
       r: blob.r,
+      myBots: myBots,
       botCoordinates: maybeBotCoordinates
     };
     socket.emit('update', data);

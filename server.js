@@ -13,6 +13,12 @@ function Bot(botID,x, y, type, owner) {
   this.type = type;
   this.owner = owner;
 
+  var initX = Math.random()*2-1;
+  var initY = Math.random()*2-1;
+  if(initX<0.25&&initX>=0){initX+=0.25;}
+  if(initX>-0.25&&initX<0){initX-=0.25;}
+  if(initY<0.25&&initY>=0){initY+=0.25;}
+  if(initY>-0.25&&initY<0){initY-=0.25;}
   this.directionX = 0.9;
   this.directionY = 0.8;
 }
@@ -92,10 +98,28 @@ io.sockets.on('connection',
           blob.y = data.y;
           blob.r = data.r;
         }
+
         //if this is first
         if(bots.length == 0){
           addBot("schnatz", data.botCoordinates[0],socket.id);
         }
+        //update his bots
+        var hisBots = data.myBots;
+        for(i=0;i<hisBots.length;i++){
+          var hisBot = hisBots[i];
+          for(j=0;j<bots.length;j++){
+            //find the bot in array:
+            if(hisBot.id==bots[j].id){
+              bots[j].x = hisBot.x;
+              bots[j].y = hisBot.y;
+              bots[j].directionX = hisBot.directionX;
+              bots[j].directionY = hisBot.directionY;
+
+            }
+          }
+        }
+
+
       }
     );
 
@@ -114,12 +138,12 @@ io.sockets.on('connection',
     socket.on('botEaten',
       function(id) {
         console.log("Server: Bot ("+id+") got eaten.");
+        io.sockets.emit('botEaten', id);
         for(i=0; i<bots.length;i++){
           if(bots[i].id == id){
             bots.splice(i,1);
           }
         }
-        io.sockets.emit('botEaten', id);
       }
     );
 

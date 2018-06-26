@@ -1,12 +1,12 @@
 class Bot {
-  constructor(id, x, y, type, constrainX, constrainY, directionX, directionY){
+  constructor(id, x, y, type, constrainX, constrainY, owner, directionX, directionY){
     this.id = id;
     this.type = type;
     this.pos = createVector(x, y);
     this.direction = createVector(directionX, directionY); //is always between [-1,-0.25] or [0.25,1]
     if(this.type=="schnatz"){
       this.r = 5;
-      this.speed = 1.5;//3.5
+      this.speed = 2;//3.5
     }else if(this.type=="default"){
       this.r = 4; //will be displayed with double size
       this.sizeIncrease=2;
@@ -14,8 +14,7 @@ class Bot {
     }
     this.constrainX = constrainX;
     this.constrainY = constrainY
-
-    this.justUpdated=0;
+    this.owner = owner; //am i the owner?
   }
 
   move() {
