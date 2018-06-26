@@ -22,8 +22,9 @@ function updateBot(bot, newBot){
     bot.pos.y = newBot.y;
     bot.direction.x = newBot.directionX;
     bot.direction.y = newBot.directionY;
-    bot.justUpdated = 10;
+    bot.justUpdated = 30;
   }
+  console.log(bot.justUpdated);
 }
 
 //sets the amount of Food, so that to all time, the current amount of food is near the totalFoodValue
