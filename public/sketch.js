@@ -4,6 +4,7 @@ var blob; //me
 var blobs = []; //enemys+me (from server)
 var food = [];
 var bots = [];
+var eatenBots =[];
 
 var totalFoodValue;
 var foodShape; //make food look different

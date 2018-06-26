@@ -123,14 +123,20 @@ class Blob {
           var otherArea = PI * otherBlob.r * otherBlob.r;
           this.r = sqrt((myArea+otherArea) / PI);
         }else if(otherBlob instanceof Bot){ //if  it was a bot
+          //check if bot already got eaten, but server just doesnt know yet
+          for(i=0; i<eatenBots.length; i++){
+            if(eatenBots[i] == otherBlob.id){
+              return false;
+            }
+          }
           if(otherBlob.type = "schnatz"){
             var myArea = PI * this.r * this.r;
             var otherArea = PI * otherBlob.r * otherBlob.r;
             this.r = sqrt((myArea+3*otherArea) / PI);
             schnatz_sound.play();
+            eatenBots.push(otherBlob.id);
           }
         }
-
         return true;
       }else{//block each other off
         var moveBack = p5.Vector.sub( this.pos,otherBlob.pos);
