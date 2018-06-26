@@ -15,6 +15,8 @@ class Bot {
     this.constrainX = constrainX;
     this.constrainY = constrainY
     this.owner = owner; //am i the owner?
+
+    this.justUpdated=0;
   }
 
   move() {
