@@ -23,18 +23,17 @@ function preload(){
       schnatz_sound = loadSound("assets/schnatz_sound.mp3");
 
       background_image = loadImage("assets/sky-background.jpg");
-      sprite_image = loadImage("assets/sprite.jpg");
 }
 
 function setup() {
   setupSocket();
-  var canvas = createCanvas(900, 600);
+  var canvas = createCanvas(1800, 900);
   canvas.parent('canvas_container'); //put canvas in its html div container
 
-  c = 2;
+  c = 4;
   constrainX = width/c;
   constrainY = height/c;
-  totalFoodValue = 400/c;
+  totalFoodValue = 3000/(c*c);
   foodShape = random(0,4000);
   //set food:
   setFood();

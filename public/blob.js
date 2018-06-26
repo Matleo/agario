@@ -10,7 +10,7 @@ class Blob {
 
     this.counter = 0;
     this.wobble = [this.r*2,this.r*2]; //store wobble sizes here
-    this.wobbleStrength = 0.003; //how much wobble
+    this.wobbleStrength = 0.0045; //how much wobble
     this.wobbleCount = 0; //how long to wobble
     this.shrinkAmount = 0.0035; //how much to decrease in size (r) every n frames
 
@@ -52,7 +52,6 @@ class Blob {
     if(this.type =="me"){
       if(this.r > this.maxSize){
         this.maxSize = this.r;
-        console.log(this.maxSize);
         var score = document.getElementById("score");
         score.innerHTML = this.maxSize;
       }
