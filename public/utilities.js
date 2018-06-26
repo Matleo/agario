@@ -17,7 +17,7 @@ function getNonCollidingCoordinates(minunits){
 
 function updateBot(bot, newBot){
   bot.justUpdated--;
-  if(bot.justUpdated > 0 && (bot.direction.x != newBot.directionX | bot.direction.y != newBot.directionY)){
+  if(bot.justUpdated <= 0 && (bot.direction.x != newBot.directionX | bot.direction.y != newBot.directionY)){
     bot.pos.x = newBot.x;
     bot.pos.y = newBot.y;
     bot.direction.x = newBot.directionX;
