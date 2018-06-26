@@ -77,25 +77,12 @@ function draw() {
     }
 
 
-    //send all bots that i have ownership of
-    var myBots = [];
-    for(i=0; i<bots.length;i++){
-      if(bots[i].owner){
-        var myBot = bots[i];
-        myBots.push({
-                    id:myBot.id,
-                    x:myBot.pos.x,
-                    y:myBot.pos.y,
-                    directionX:myBot.direction.x,
-                    directionY:myBot.direction.y});
-      }
-    }
+    //send update
     var maybeBotCoordinates = [getNonCollidingCoordinates(10),getNonCollidingCoordinates(10),getNonCollidingCoordinates(10)];  //new coordinates, that could be used  for a bot
     var data = {
       x: blob.pos.x,
       y: blob.pos.y,
       r: blob.r,
-      myBots: myBots,
       botCoordinates: maybeBotCoordinates
     };
     socket.emit('update', data);

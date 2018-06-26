@@ -1,5 +1,5 @@
 class Bot {
-  constructor(id, x, y, type, constrainX, constrainY, owner, directionX, directionY){
+  constructor(id, x, y, type, constrainX, constrainY, directionX, directionY){
     this.id = id;
     this.type = type;
     this.pos = createVector(x, y);
@@ -14,7 +14,6 @@ class Bot {
     }
     this.constrainX = constrainX;
     this.constrainY = constrainY
-    this.owner = owner; //am i the owner?
 
     this.justUpdated=0;
   }

@@ -13,19 +13,14 @@ function Bot(botID,x, y, type, owner) {
   this.type = type;
   this.owner = owner;
 
-  var initX = Math.random()*2-1;
-  var initY = Math.random()*2-1;
-  if(initX<0.25&&initX>=0){initX+=0.25;}
-  if(initX>-0.25&&initX<0){initX-=0.25;}
-  if(initY<0.25&&initY>=0){initY+=0.25;}
-  if(initY>-0.25&&initY<0){initY-=0.25;}
   this.directionX = 0.9;
   this.directionY = 0.8;
 }
+var counter=0;
 function addBot(type, coordinates, socketId){
   var x = coordinates[0];
   var y = coordinates[1];
-  var botID = socketId + "_"+type;
+  var botID = socketId + "_"+type+"-"+counter++;
   bots.push(new Bot(botID,x,y,type,socketId));
 }
 
@@ -97,28 +92,10 @@ io.sockets.on('connection',
           blob.y = data.y;
           blob.r = data.r;
         }
-
         //if this is first
         if(bots.length == 0){
           addBot("schnatz", data.botCoordinates[0],socket.id);
         }
-        //update his bots
-        var hisBots = data.myBots;
-        for(i=0;i<hisBots.length;i++){
-          var hisBot = hisBots[i];
-          for(j=0;j<bots.length;j++){
-            //find the bot in array:
-            if(hisBot.id==bots[j].id){
-              bots[j].x = hisBot.x;
-              bots[j].y = hisBot.y;
-              bots[j].directionX = hisBot.directionX;
-              bots[j].directionY = hisBot.directionY;
-
-            }
-          }
-        }
-
-
       }
     );
 
@@ -142,6 +119,7 @@ io.sockets.on('connection',
             bots.splice(i,1);
           }
         }
+        io.sockets.emit('botEaten', id);
       }
     );
 

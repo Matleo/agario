@@ -16,8 +16,8 @@ function getNonCollidingCoordinates(minunits){
 }
 
 function updateBot(bot, newBot){
-  bot.justUpdated--;
-  if(bot.justUpdated <= 0 && (bot.direction.x != newBot.directionX | bot.direction.y != newBot.directionY)){
+  bot.justUpdated--;//dont update for 30 frames if just got updated
+  if(bot.justUpdated <= 0 && (bot.direction.x != newBot.directionX | bot.direction.y != newBot.directionY)){ //if direction changed
     bot.pos.x = newBot.x;
     bot.pos.y = newBot.y;
     bot.direction.x = newBot.directionX;
@@ -72,7 +72,8 @@ function showFoodAndBlobsAndBots(){
   for (i = bots.length - 1; i >= 0; i--) {
     bots[i].update();
     if (blob.eats(bots[i])) {
-       bots.splice(i, 1);
+      socket.emit('botEaten', bots[i].id);
+      bots.splice(i, 1);
     }
   }
 //blobs
@@ -103,31 +104,27 @@ function setupSocket(){
         }
 
         //set bots initially
-        if(data.bots.length != bots.length){
+        if(bots.length != data.bots.length){
           bots = [];
           for(i = 0; i<data.bots.length;i++){
             var myBot = data.bots[i];
-            if(myBot.owner == socket.id){
-              bots.push(new Bot(myBot.id, myBot.x, myBot.y, myBot.type, constrainX, constrainY, true, myBot.directionX, myBot.directionY));
-            }else{
-              bots.push(new Bot(myBot.id, myBot.x, myBot.y, myBot.type, constrainX, constrainY, false, myBot.directionX, myBot.directionY));
-            }
-          }
-        }else{//or update bots (without deleting them)
-          for(i = 0; i<data.bots.length;i++){
-            var myBot = data.bots[i];
-            for(j=0; j<bots.length;j++){
-              //search for this bot
-              if(bots[j].id == myBot.id){
-                updateBot(bots[j],myBot);//set x,y and directions
-                break;
-              }
-            }
+            bots.push(new Bot(myBot.id, myBot.x, myBot.y, myBot.type, constrainX, constrainY,  myBot.directionX, myBot.directionY));
           }
         }
+
         //if was initial, now is not anymore
         if(initiated != null && !initiated){
           initiated = true;
+        }
+      }
+    );
+
+    socket.on('botEaten',
+      function(id) {
+        for (i = bots.length - 1; i >= 0; i--) {
+          if (bots[i].id == id) {
+            bots.splice(i, 1);
+          }
         }
       }
     );
@@ -136,8 +133,8 @@ function setupSocket(){
       function(id) {
         if(id == blob.id){
           die();
+        }
       }
-    }
     );
 }
 

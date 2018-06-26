@@ -128,13 +128,6 @@ class Blob {
             var otherArea = PI * otherBlob.r * otherBlob.r;
             this.r = sqrt((myArea+3*otherArea) / PI);
             schnatz_sound.play();
-            socket.emit('botEaten', otherBlob.id);
-            for(i=0;i<bots.length;i++){
-                if(bots[i].id == otherBlob.id){
-                  bots.splice(i,1);
-                  break;
-                }
-            }
           }
         }
 
