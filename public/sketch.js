@@ -31,7 +31,7 @@ function setup() {
   var canvas = createCanvas(1800, 900);
   canvas.parent('canvas_container'); //put canvas in its html div container
 
-  c = 16;
+  c = 4;
   constrainX = width/c;
   constrainY = height/c;
   totalFoodValue = 3000/(c*c);
