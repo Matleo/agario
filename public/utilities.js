@@ -115,7 +115,9 @@ function setupSocket(){
             for(j=0; j<bots.length;j++){
               //search for this bot
               if(bots[j].id == myBot.id){
-                updateBot(bots[j],myBot);//set x,y and directions
+                if(bots[j].owner == false){
+                  updateBot(bots[j],myBot);//set x,y and directions
+                }
                 break;
               }
             }
